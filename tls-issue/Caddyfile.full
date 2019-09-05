@@ -1,0 +1,15 @@
+*:2020 {
+  bind 0.0.0.0
+  proxy / https://fn_lb:8080 {
+    transparent
+    insecure_skip_verify
+  }
+
+  proxy /v2/ https://fn_api:8080 {
+    transparent
+    insecure_skip_verify
+  }
+
+  tls local@local.com
+  tls .certificates/server.crt .certificates/server.key
+}

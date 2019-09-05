@@ -1,0 +1,73 @@
+version: '3.3'
+
+volumes:
+  pgdata: {}
+
+services:
+  fn_runner:
+    image: fnproject/fnserver
+    deploy:
+      replicas: 3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./.certificates/fn_runner.crt:/app/server.crt
+      - ./.certificates/server.key:/app/server.key
+      - ./.certificates:/app/.certificates
+      - ./fn_entrypoint.sh:/app/fn_entrypoint.sh
+      - /home/ariel/.fn/iofs:/iofs
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=pure-runner
+      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_PATH=/iofs
+    entrypoint:
+      - ./fn_entrypoint.sh
+
+  fn_api:
+    image: fnproject/fnserver:local
+    volumes:
+      - ./.certificates/fn_api.crt:/app/server.crt
+      - ./.certificates/server.key:/app/server.key
+      - ./.certificates:/app/.certificates
+      - ./fn_entrypoint.sh:/app/fn_entrypoint.sh
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=api
+      - FN_PUBLIC_LB_URL=https://caddy:2020
+      - FN_DB_URL=postgres://postgres:12345@postgresdb/fndb?sslmode=disable
+    entrypoint:
+      - ./fn_entrypoint.sh
+
+  fn_lb:
+    image: fnproject/fnserver:local
+    volumes:
+      - ./.certificates/fn_lb.crt:/app/server.crt
+      - ./.certificates/server.key:/app/server.key
+      - ./.certificates:/app/.certificates
+      - ./fn_entrypoint.sh:/app/fn_entrypoint.sh
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=lb
+      - FN_RUNNER_API_URL=https://fn_api:8080
+      - FN_RUNNER_ADDRESSES=fn_runner:9190
+    entrypoint:
+      - ./fn_entrypoint.sh
+
+  caddy:
+    image: abiosoft/caddy
+    volumes:
+      - ./Caddyfile.full:/etc/Caddyfile
+      - ./.certificates:/srv/.certificates
+    ports:
+      - 2020:2020
+    environment:
+      - ACME_AGREE=true
+
+  postgresdb:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=12345
