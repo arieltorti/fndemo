@@ -11,14 +11,14 @@ In a nutshell Fn is an open source, containerized, cloud-agnostic platform to de
 
 ## Content
 
-[x] Hello World
-[x] TLS Issue
-[ ] Function Pipelines
-[ ] Middlewares and listeners
-[ ] Fn Flow
-[ ] Fn UI
-[ ] Scaling
-[ ] Stress test
-[ ] Difficulty of migration
-[ ] Auth Middleware
+- [x] Hello World
+- [x] TLS Issue
+- [ ] Function Pipelines
+- [ ] Middlewares and listeners
+- [ ] Fn Flow
+- [ ] Fn UI
+- [ ] Scaling
+- [ ] Stress test
+- [ ] Difficulty of migration
+- [ ] Auth Middleware
 
