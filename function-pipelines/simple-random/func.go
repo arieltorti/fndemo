@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -35,10 +36,13 @@ func requestNewNumber(state *State) *Msg {
 	if err != nil {
 		fmt.Println("Error ", err)
 	}
+	defer resp.Body.Close()
 	respMsg := &Msg{}
 
-	// TOASK: Should I close body ??
-	json.NewDecoder(resp.Body).Decode(respMsg)
+	err = json.NewDecoder(resp.Body).Decode(respMsg)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return respMsg
 }
 
@@ -48,7 +52,10 @@ func randomNTimes(ctx context.Context, in io.Reader, out io.Writer) {
 	state := &State{Times: 0}
 	msg := &Msg{}
 
-	json.NewDecoder(in).Decode(state)
+	err := json.NewDecoder(in).Decode(state)
+	if err != nil && err != io.EOF {
+		log.Fatal(err)
+	}
 
 	if state.Times < times {
 		msg.Msg = append(msg.Msg, rand.Intn(10))
@@ -57,5 +64,8 @@ func randomNTimes(ctx context.Context, in io.Reader, out io.Writer) {
 
 		msg.Msg = append(msg.Msg, respMsg.Msg...)
 	}
-	json.NewEncoder(out).Encode(&msg)
+	err = json.NewEncoder(out).Encode(&msg)
+	if err != nil && err != io.EOF {
+		log.Fatal(err)
+	}
 }
