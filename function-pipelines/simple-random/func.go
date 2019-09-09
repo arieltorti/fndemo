@@ -24,6 +24,14 @@ type Msg struct {
 	Msg []int `json:"msg"`
 }
 
+func _getMapWithDefault(m map[string]string, key string, default_value string) string {
+	v, ok := m[key]
+	if !ok {
+		v = default_value
+	}
+	return v
+}
+
 func main() {
 	fdk.Handle(fdk.HandlerFunc(randomNTimes))
 }
@@ -48,7 +56,7 @@ func requestNewNumber(state *State) *Msg {
 
 func randomNTimes(ctx context.Context, in io.Reader, out io.Writer) {
 	fdkContext := fdk.GetContext(ctx)
-	times, _ := strconv.Atoi(fdkContext.Config()["times"])
+	times, _ := strconv.Atoi(_getMapWithDefault(fdkContext.Config(), "times", "5"))
 	state := &State{Times: 0}
 	msg := &Msg{}
 
