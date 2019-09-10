@@ -13,10 +13,6 @@ import (
 	fdk "github.com/fnproject/fdk-go"
 )
 
-func main() {
-	fdk.Handle(fdk.HandlerFunc(myHandler))
-}
-
 type ChannelResult struct {
 	Result int
 	Error error
@@ -26,7 +22,7 @@ type Equation struct {
 	Equation string `json:"equation"`
 }
 
-type Equations struct {
+type UserInput struct {
 	Equations []string `json:"equations"`
 }
 
@@ -35,37 +31,21 @@ type Response struct {
 	Error string `json:"error"`
 }
 
-const solveUrl = "http://localhost:8080/t/demo/polishcalc-solver"
+const ApiURL = "http://localhost:8080"
+var solveURL string
 
-func solveEquation(equation string, ch chan<-*ChannelResult) {
-	buf := bytes.NewBuffer(nil)
-	payload := &Equation{Equation: equation}
-	json.NewEncoder(buf).Encode(payload)
-
-	resp, err := http.Post(solveUrl, "application/json", buf)
-	if err != nil {
-		ch <- &ChannelResult{Error: err}
-		return
-	}
-	defer resp.Body.Close()
-	solverResponse := new(Response)
-
-	if err := json.NewDecoder(resp.Body).Decode(solverResponse); err != nil {
-		ch <- &ChannelResult{Error: err}
-		return
-	}
-
-	err = nil
-	if solverResponse.Error != ""{
-		err = errors.New(solverResponse.Error)
-	}
-	ch <- &ChannelResult{Result: solverResponse.Result, Error: err}
+func main() {
+	solveURL = fmt.Sprintf("%v/t/demo/polishcalc-solver", ApiURL)
+	fdk.Handle(fdk.HandlerFunc(myHandler))
 }
 
 func myHandler(ctx context.Context, in io.Reader, out io.Writer) {
 	// Get the equations from the user
-	equations := new(Equations)
-	json.NewDecoder(in).Decode(equations)
+	equations := new(UserInput)
+	if err := json.NewDecoder(in).Decode(equations); err != nil {
+		errorResponse(err, out)
+		return
+	}
 
 	if len(equations.Equations) == 0 {
 		errorResponse(errors.New("no equations or invalid equations were provided"), out)
@@ -91,9 +71,39 @@ func myHandler(ctx context.Context, in io.Reader, out io.Writer) {
 
 	respMsg := Response{Result: accumResult}
 	if err := json.NewEncoder(out).Encode(respMsg); err != nil {
-		log.Panic(err)
+		errorResponse(err, out)
 	}
 	return
+}
+
+func solveEquation(equation string, ch chan<-*ChannelResult) {
+	// Encode the equation in an io.Reader
+	buf := bytes.NewBuffer(nil)
+	payload := &Equation{Equation: equation}
+	if err := json.NewEncoder(buf).Encode(payload); err != nil {
+		ch <- &ChannelResult{Error: err}
+		return
+	}
+
+	resp, err := http.Post(solveURL, "application/json", buf)
+	if err != nil {
+		ch <- &ChannelResult{Error: err}
+		return
+	}
+	defer resp.Body.Close()
+
+	solverResponse := new(Response)
+	if err := json.NewDecoder(resp.Body).Decode(solverResponse); err != nil {
+		ch <- &ChannelResult{Error: err}
+		return
+	}
+
+	// If the solver sends an error it will encode it in the response
+	// We need to grab it from the response and pass it along
+	if solverResponse.Error != "" {
+		err = errors.New(solverResponse.Error)
+	}
+	ch <- &ChannelResult{Result: solverResponse.Result, Error: err}
 }
 
 func errorResponse(err error, out io.Writer) {
