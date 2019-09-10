@@ -1,0 +1,9 @@
+schema_version: 20180708
+name: polishcalc-solver
+version: 0.0.10
+runtime: go
+entrypoint: ./func
+triggers:
+- name: polishcalc-solver
+  type: http
+  source: /polishcalc-solver
