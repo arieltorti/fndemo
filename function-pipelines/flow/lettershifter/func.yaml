@@ -1,5 +1,5 @@
 schema_version: 20180708
-name: polishcalc-accum
-version: 0.0.1
+name: lettershifter
+version: 0.0.7
 runtime: go
 entrypoint: ./func

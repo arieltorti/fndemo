@@ -14,7 +14,7 @@ import (
 	fdk "github.com/fnproject/fdk-go"
 )
 
-const ApiUrl = "http://localhost:8080"
+const ApiUrl = "http://caddy:2020"
 
 type State struct {
 	Times int `json:"times"`
@@ -38,7 +38,7 @@ func main() {
 
 func requestNewNumber(state *State) *Msg {
 	jsonBody, _ := json.Marshal(state)
-	resp, err := http.Post(fmt.Sprintf("%v/t/demo/simple-random", ApiUrl),
+	resp, err := http.Post(fmt.Sprintf("%v/t/pipeline-demo/simple-random", ApiUrl),
 		"application/json", bytes.NewBuffer(jsonBody))
 
 	if err != nil {

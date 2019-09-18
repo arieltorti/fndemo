@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  fnserver:
+    image: fnproject/fnserver:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ariel/.fn/iofs:/iofs
+    environment:
+      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_PATH=/iofs
+      - FN_LOG_LEVEL=debug
+      - FN_DOCKER_NETWORKS=host
+    ports:
+      - 8080:8080
+
+  flowui:
+    image: fnproject/flow:ui
+    ports:
+      - 3000:3000
+    network_mode: host
+
+  flowserver:
+    image: fnproject/flow:latest
+    environment:
+      - no_proxy=fnserver
+      - API_URL=http://fnserver:8080/invoke
+      - LOG_LEVEL=debug
+    ports:
+      - 8081:8081
+      - 9999:9999
+    network_mode: host

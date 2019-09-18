@@ -31,11 +31,11 @@ type Response struct {
 	Error string `json:"error"`
 }
 
-const ApiURL = "http://localhost:8080"
+const ApiURL = "http://caddy:2020"
 var solveURL string
 
 func main() {
-	solveURL = fmt.Sprintf("%v/t/demo/polishcalc-solver", ApiURL)
+	solveURL = fmt.Sprintf("%v/t/pipeline-demo/polishcalc-solver", ApiURL)
 	fdk.Handle(fdk.HandlerFunc(myHandler))
 }
 
