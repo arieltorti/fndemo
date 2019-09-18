@@ -1,4 +1,7 @@
 #!/bin/sh
+set -e
+# Script to install fn cli inside the containers for testing
+# and registering the certificates
 echo "Running entrypoint"
 
 apk update && apk add curl

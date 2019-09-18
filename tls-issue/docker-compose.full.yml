@@ -5,7 +5,7 @@ volumes:
 
 services:
   fn_runner:
-    image: fnproject/fnserver
+    image: fnproject/fnserver:local
     deploy:
       replicas: 3
     volumes:
@@ -69,5 +69,6 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_PASSWORD=12345

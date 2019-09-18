@@ -1,3 +1,5 @@
+#!/bin/sh
+
 mkdir -p .certificates
 openssl genrsa -out .certificates/server.key 2048
 openssl rsa -in .certificates/server.key -out .certificates/server.key
@@ -14,5 +16,3 @@ openssl x509 -req -sha256 -days 365 -in .certificates/fn_runner.csr -signkey .ce
 
 openssl req -sha256 -new -key .certificates/server.key -out .certificates/fn_lb.csr -subj '/CN=fn_lb'
 openssl x509 -req -sha256 -days 365 -in .certificates/fn_lb.csr -signkey .certificates/server.key -out .certificates/fn_lb.crt
-
-cat .certificates/server.crt .certificates/server.key > .certificates/cert.pem

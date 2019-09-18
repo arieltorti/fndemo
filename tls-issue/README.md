@@ -70,3 +70,10 @@ And it works as well. On a side note you can try and not take my word for it, bu
 
 Most probably the user prologic made a configuration error. When we deploy a function, the trigger is stored as an annotation inside the function ([More on annotations](#todo)), if the function was deployed without tls then the trigger endpoint is saved using `http://` instead of `https://`.
 This means that if you deploy a function without tls and later try to use it behind tls then it won't work.
+
+### NOTES
+
+Add the following line to `/etc/hosts`
+```
+127.0.0.1 caddy
+```
