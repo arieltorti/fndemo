@@ -5,7 +5,7 @@ volumes:
 
 services:
   fn_runner:
-    image: fnproject/fnserver:local
+    image: maks500/fnserver:local
     deploy:
       replicas: 3
     volumes:
@@ -24,7 +24,7 @@ services:
       - ./fn_entrypoint.sh
 
   fn_api:
-    image: fnproject/fnserver:local
+    image: maks500/fnserver:local
     volumes:
       - ./.certificates/fn_api.crt:/app/server.crt
       - ./.certificates/server.key:/app/server.key
@@ -39,7 +39,7 @@ services:
       - ./fn_entrypoint.sh
 
   fn_lb:
-    image: fnproject/fnserver:local
+    image: maks500/fnserver:local
     volumes:
       - ./.certificates/fn_lb.crt:/app/server.crt
       - ./.certificates/server.key:/app/server.key

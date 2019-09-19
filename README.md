@@ -13,7 +13,7 @@ In a nutshell Fn is an open source, containerized, cloud-agnostic platform to de
 
 - [x] Hello World
 - [x] TLS Issue
-- [ ] Function Pipelines
+- [x] Function Pipelines
 - [ ] Middlewares and listeners
 - [ ] Fn Flow
 - [ ] Fn UI
@@ -21,4 +21,4 @@ In a nutshell Fn is an open source, containerized, cloud-agnostic platform to de
 - [ ] Stress test
 - [ ] Difficulty of migration
 - [ ] Auth Middleware
-
+- [x] PoCs

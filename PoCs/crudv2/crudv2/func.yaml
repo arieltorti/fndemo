@@ -1,0 +1,15 @@
+schema_version: 20180708
+name: crudv2
+version: 0.0.23
+runtime: go
+entrypoint: ./func
+triggers:
+- name: crudv2
+  type: http
+  source: /crudv2
+- name: get
+  type: http
+  source: /crudv2/get
+- name: put
+  type: http
+  source: /crudv2/put

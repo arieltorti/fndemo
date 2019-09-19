@@ -1,0 +1,7 @@
+schema_version: 20180708
+name: build-from
+version: 0.0.1
+runtime: python
+build_image: python:3.6
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
