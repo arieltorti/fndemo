@@ -1,0 +1,5 @@
+schema_version: 20180708
+name: flowinvoke
+version: 0.0.7
+runtime: go
+entrypoint: ./func

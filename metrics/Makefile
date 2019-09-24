@@ -1,4 +1,4 @@
-NAME ?= function-pipelines
+NAME ?= fn-metrics
 
 .PHONY: start
 start:

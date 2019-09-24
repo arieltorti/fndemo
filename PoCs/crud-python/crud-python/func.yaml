@@ -1,0 +1,20 @@
+schema_version: 20180708
+name: crud-python
+version: 0.0.3
+runtime: python
+entrypoint: /python/bin/fdk /function/func.py handler
+memory: 256
+timeout: 300
+triggers:
+- name: create-post
+  type: http
+  source: /crud/create
+- name: retrieve-get
+  type: http
+  source: /crud/get
+- name: update-put
+  type: http
+  source: /crud/update
+- name: delete-post
+  type: http
+  source: /crud/delete

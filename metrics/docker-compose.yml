@@ -1,0 +1,80 @@
+version: '3.3'
+
+volumes:
+  pgdata: {}
+
+services:
+  flowserver:
+    image: fnproject/flow:latest
+    environment:
+      - no_proxy=fn_lb
+      - API_URL=http://caddy:2020/invoke
+    ports:
+      - 8081:8081
+
+#  flowui:
+#    image: fnproject/flow:ui
+#    ports:
+#      - 3000:3000
+#    environment:
+#      - API_URL=http://caddy:2020
+#      - COMPLETER_BASE_URL=http://flowserver:8081
+
+  fn_runner:
+    image: fnproject/fnserver:latest
+    deploy:
+      replicas: 3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ariel/.fn/iofs:/iofs
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=pure-runner
+      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_PATH=/iofs
+      - FN_DOCKER_NETWORKS=host
+
+  fn_api:
+    image: fnproject/fnserver:latest
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=api
+      - FN_PUBLIC_LB_URL=http://caddy:2020
+      - FN_DB_URL=postgres://postgres:12345@postgresdb/fndb?sslmode=disable
+
+  fn_lb:
+    image: fnproject/fnserver:latest
+    environment:
+      - FN_LOG_LEVEL=debug
+      - FN_NODE_TYPE=lb
+      - FN_RUNNER_API_URL=http://fn_api:8080
+      - FN_RUNNER_ADDRESSES=fn_runner:9190
+
+  caddy:
+    image: abiosoft/caddy
+    volumes:
+      - ./Caddyfile:/etc/Caddyfile
+    ports:
+      - 2020:2020
+
+  postgresdb:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=12345
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000

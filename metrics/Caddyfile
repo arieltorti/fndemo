@@ -1,0 +1,10 @@
+*:2020 {
+  bind 0.0.0.0
+  proxy / http://fn_lb:8080 {
+    transparent
+  }
+
+  proxy /v2/ http://fn_api:8080 {
+    insecure_skip_verify
+  }
+}
