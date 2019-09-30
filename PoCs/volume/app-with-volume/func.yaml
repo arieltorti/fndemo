@@ -1,6 +1,6 @@
 schema_version: 20180708
 name: app-with-volume
-version: 0.0.6
+version: 0.0.8
 runtime: python
 run_image: maks500/fn_run_image:latest
 entrypoint: /python/bin/fdk /function/func.py handler

@@ -7,7 +7,7 @@ The name of the input parameter can be configured, and as you will see, function
 
 ## Running
 
-First start the fn server and create an app.
+First start the Fn server and create an app.
 
 ```
 fn start
@@ -52,7 +52,7 @@ But remember that function config has priority over app config, if we change the
 fn config fn demo-python config-hierarchy "param" "lastname"
 ```
 
-Then the app config will be overwritten by the function config resulting in 
+Then the app config will be overwritten by the function config resulting in
 
 ```
 echo '{"lastname": "Mars"}' | fn invoke demo-python config-hierarchy
