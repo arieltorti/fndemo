@@ -2,16 +2,16 @@ version: '3.3'
 
 services:
   fnserver:
-    image: fnproject/fnserver:local
+    image: maks500/fnserver:local
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./.certificates/server.key:/app/server.key
       - ./.certificates/server.crt:/app/server.crt
       - ./.certificates:/app/.certificates
-      - /home/ariel/.fn/iofs:/iofs
+      - $HOME/.fn/iofs:/iofs
       - ./fn_entrypoint.sh:/app/fn_entrypoint.sh
     environment:
-      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_DOCKER_PATH=$HOME/.fn/iofs
       - FN_IOFS_PATH=/iofs
       - FN_API_URL=https://caddy:2020
     entrypoint:
@@ -26,4 +26,3 @@ services:
       - 2020:2020
     environment:
       - ACME_AGREE=true
-

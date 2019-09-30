@@ -14,11 +14,11 @@ services:
       - ./.certificates/server.key:/app/server.key
       - ./.certificates:/app/.certificates
       - ./fn_entrypoint.sh:/app/fn_entrypoint.sh
-      - /home/ariel/.fn/iofs:/iofs
+      - $HOME/.fn/iofs:/iofs
     environment:
       - FN_LOG_LEVEL=debug
       - FN_NODE_TYPE=pure-runner
-      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_DOCKER_PATH=$HOME/.fn/iofs
       - FN_IOFS_PATH=/iofs
     entrypoint:
       - ./fn_entrypoint.sh
