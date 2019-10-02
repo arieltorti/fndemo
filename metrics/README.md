@@ -1,8 +1,6 @@
 # Metrics
 
-WARNING: THIS IS A WIP
-
-The fnproject exposes metrics about the docker environment, cpu and memory consumption, number of running, queue, completed and failed function executions and many more.
+The Fn server exposes metrics about the docker environment, cpu and memory consumption, number of running, queue, completed and failed function executions and many more.
 
 In this demo I tried to add my own custom metrics, in order to export a metric it has to registered on a View and the View needs a go Context object, given that the functions
 can't access it's parent context the only way I could add metrics was to register them inside listeners as such

@@ -1,7 +1,13 @@
-version: '3.3'
+version: "3.3"
+
+networks:
+  net:
+    driver: overlay
+    attachable: true
 
 volumes:
   pgdata: {}
+  grafana_vol: {}
 
 services:
   flowserver:
@@ -11,14 +17,19 @@ services:
       - API_URL=http://caddy:2020/invoke
     ports:
       - 8081:8081
+    networks:
+      - net
 
-#  flowui:
-#    image: fnproject/flow:ui
-#    ports:
-#      - 3000:3000
-#    environment:
-#      - API_URL=http://caddy:2020
-#      - COMPLETER_BASE_URL=http://flowserver:8081
+  flowui:
+    image: fnproject/flow:ui
+    ports:
+      - 3001:3001
+    environment:
+      - API_URL=http://caddy:2020
+      - COMPLETER_BASE_URL=http://flowserver:8081
+      - PORT=3001
+    networks:
+      - net
 
   fn_runner:
     image: fnproject/fnserver:latest
@@ -26,13 +37,16 @@ services:
       replicas: 3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/ariel/.fn/iofs:/iofs
+      - $HOME/.fn/iofs:/iofs
     environment:
       - FN_LOG_LEVEL=debug
       - FN_NODE_TYPE=pure-runner
-      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_DOCKER_PATH=$HOME/.fn/iofs
       - FN_IOFS_PATH=/iofs
       - FN_DOCKER_NETWORKS=host
+      - FN_MAX_OPEN_FILES=600
+    networks:
+      - net
 
   fn_api:
     image: fnproject/fnserver:latest
@@ -41,6 +55,9 @@ services:
       - FN_NODE_TYPE=api
       - FN_PUBLIC_LB_URL=http://caddy:2020
       - FN_DB_URL=postgres://postgres:12345@postgresdb/fndb?sslmode=disable
+      - FN_MAX_OPEN_FILES=600
+    networks:
+      - net
 
   fn_lb:
     image: fnproject/fnserver:latest
@@ -49,6 +66,20 @@ services:
       - FN_NODE_TYPE=lb
       - FN_RUNNER_API_URL=http://fn_api:8080
       - FN_RUNNER_ADDRESSES=fn_runner:9190
+      - FN_MAX_OPEN_FILES=600
+    networks:
+      - net
+
+  dockerd_exporter:
+    image: abiosoft/caddy
+    volumes:
+      - ./Dockerd_Caddyfile:/etc/Caddyfile
+    environment:
+      - DOCKER_GWBRIDGE_IP=172.19.0.1
+    networks:
+      - net
+    deploy:
+      mode: global
 
   caddy:
     image: abiosoft/caddy
@@ -56,6 +87,8 @@ services:
       - ./Caddyfile:/etc/Caddyfile
     ports:
       - 2020:2020
+    networks:
+      - net
 
   postgresdb:
     image: postgres
@@ -66,6 +99,8 @@ services:
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_PASSWORD=12345
+    networks:
+      - net
 
   prometheus:
     image: prom/prometheus
@@ -73,8 +108,14 @@ services:
       - 9090:9090
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - net
 
   grafana:
     image: grafana/grafana
     ports:
       - 3000:3000
+    volumes:
+      - grafana_vol:/var/lib/grafana
+    networks:
+      - net
