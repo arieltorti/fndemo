@@ -26,11 +26,11 @@ services:
       replicas: 3
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/ariel/.fn/iofs:/iofs
+      - $HOME/.fn/iofs:/iofs
     environment:
       - FN_LOG_LEVEL=debug
       - FN_NODE_TYPE=pure-runner
-      - FN_IOFS_DOCKER_PATH=/home/ariel/.fn/iofs
+      - FN_IOFS_DOCKER_PATH=$HOME/.fn/iofs
       - FN_IOFS_PATH=/iofs
       - FN_DOCKER_NETWORKS=host
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"func/polishcalc"
 	"io"
 	"log"
 
-	"func/polishcalc"
 	fdk "github.com/fnproject/fdk-go"
 )
 
